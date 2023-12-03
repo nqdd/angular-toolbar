@@ -1,33 +1,37 @@
-.toolbar {
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  &-panel {
+:host {
+  .toolbar {
+    width: 100%;
     display: flex;
-    align-items: center;
-    overflow: hidden;
     gap: 8px;
-  }
-  &-anchor {
-    position: relative;
-    &:hover {
-      .hidden-templates {
-        display: flex;
-        align-items: flex-start;
-        flex-direction: column;
-      }
-    }
-    .hidden-templates {
-      padding-top: 10px;
-      right: 0;
-      height: auto;
-      width: max-content;
-      position: absolute;
+    &-panel {
       display: flex;
       align-items: center;
-      flex-direction: column;
-      display: none;
-      gap: 8px;
+      overflow: hidden;
+      flex: 1;
+    }
+    &-anchor {
+      position: relative;
+      &:hover {
+        .hidden-templates {
+          display: flex;
+        }
+      }
+      .hidden-templates {
+        position: absolute;
+        right: 0;
+
+        width: max-content;
+        height: auto;
+        max-height: 400px;
+        padding: 10px;
+
+        overflow: auto;
+
+        flex-direction: column;
+        align-items: flex-end;
+        display: none;
+        gap: 8px;
+      }
     }
   }
 }
