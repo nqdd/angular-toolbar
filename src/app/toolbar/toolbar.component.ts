@@ -93,7 +93,7 @@ export class ToolbarComponent
   public visibleTemplates: TemplateRef<ToolbarItemTemplateDirective>[] = [];
   public hiddenTemplates: TemplateRef<ToolbarItemTemplateDirective>[] = [];
 
-  private readonly _hiddenIndex$ = new Subject<number>();
+  private readonly _hiddenIndex$ = new Subject<number | undefined>();
   private readonly _destroy$ = new Subject<void>();
   private _elementWidthMap: Record<number, number> = {};
 
@@ -151,6 +151,7 @@ export class ToolbarComponent
         return;
       }
     }
+    this._hiddenIndex$.next(this._toolbarItems?.length);
   }
 
   ngOnDestroy(): void {
