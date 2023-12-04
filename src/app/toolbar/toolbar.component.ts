@@ -49,14 +49,16 @@ export class ToolbarItemDirective {}
 
       <div class="toolbar-anchor">
         <ng-container *ngIf="collapseTemplate">
-          <ng-container *ngTemplateOutlet="collapseTemplate"> </ng-container>
-          <div class="hidden-templates">
-            <ng-container *ngFor="let template of hiddenTemplates">
-              <div appToolbarItem class="toolbar-item-hidden">
-                <ng-template *ngTemplateOutlet="template"></ng-template>
-              </div>
-            </ng-container>
-          </div>
+          <ng-container *ngIf="hiddenTemplates?.length">
+            <ng-container *ngTemplateOutlet="collapseTemplate"> </ng-container>
+            <div class="hidden-templates border-solid border-1 rounded">
+              <ng-container *ngFor="let template of hiddenTemplates">
+                <div appToolbarItem class="toolbar-item-hidden">
+                  <ng-template *ngTemplateOutlet="template"></ng-template>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
         </ng-container>
       </div>
     </div>
@@ -96,7 +98,12 @@ export class ToolbarComponent
   private readonly _destroy$ = new Subject<void>();
   private _elementWidthMap: Record<number, number> = {};
 
-  constructor(private _zone: NgZone, private _changeDetector: ChangeDetectorRef) {}
+  constructor(
+    private _zone: NgZone,
+    private _changeDetector: ChangeDetectorRef
+  ) {
+  
+  }
 
   ngAfterContentInit(): void {
     this._displayElements();
@@ -114,11 +121,6 @@ export class ToolbarComponent
   }
 
   private _composeElementWidthMap(): void {
-    this._toolbarItems?.changes
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((value) => {
-        console.log(value);
-      });
     const elements = this._toolbarItems?.toArray() ?? [];
     this._elementWidthMap = elements.reduce((map, element, index) => {
       const previouseWidth = map[index - 1] ?? 0;
@@ -135,8 +137,6 @@ export class ToolbarComponent
         startWith(this._tooltipItemTemplates?.length ?? -1)
       )
       .subscribe((hiddenIndex) => {
-        console.log(hiddenIndex);
-        console.log(this._tooltipItemTemplates?.toArray());
         const templates = this._tooltipItemTemplates?.toArray() ?? [];
         this.hiddenTemplates = templates.slice(hiddenIndex);
         this.visibleTemplates = templates.slice(0, hiddenIndex);
