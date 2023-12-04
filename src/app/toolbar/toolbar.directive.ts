@@ -1,12 +1,12 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-  selector: 'ng-template[toolbarItemTemplate]',
+  selector: 'ng-template[appToolbarItemTemplate]',
 })
 export class ToolbarItemTemplateDirective {}
 
 @Directive({
-  selector: 'ng-template[toolbarCollapseButtonTemplate]',
+  selector: 'ng-template[appToolbarCollapseButtonTemplate]',
 })
 export class ToolbarCollapseButtonTemplateDirective {}
 

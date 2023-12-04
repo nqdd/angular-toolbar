@@ -5,11 +5,11 @@ import { Component } from '@angular/core';
   template: `
     <app-toolbar [elementGap]="8">
       <ng-container *ngFor="let _ of [].constructor(100); let idx = index">
-        <ng-template toolbarItemTemplate>
+        <ng-template appToolbarItemTemplate>
           <button>Button {{ idx }}</button>
         </ng-template>
       </ng-container>
-      <ng-template toolbarCollapseButtonTemplate>More</ng-template>
+      <ng-template appToolbarCollapseButtonTemplate>More</ng-template>
     </app-toolbar>
   `,
   styles: [],

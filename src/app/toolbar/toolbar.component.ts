@@ -24,9 +24,8 @@ import {
   ToolbarItemTemplateDirective,
 } from './toolbar.directive';
 
-
 @Directive({
-  selector: '[toolbarItem]',
+  selector: '[appToolbarItem]',
 })
 export class ToolbarItemDirective {}
 
@@ -39,7 +38,7 @@ export class ToolbarItemDirective {}
           *ngFor="let template of visibleTemplates; let idx = index"
         >
           <div
-            toolbarItem
+            appToolbarItem
             class="toolbar-item-visible"
             [style.marginLeft.px]="idx > 0 ? elementGap : 0"
           >
@@ -53,7 +52,7 @@ export class ToolbarItemDirective {}
           <ng-container *ngTemplateOutlet="collapseTemplate"> </ng-container>
           <div class="hidden-templates">
             <ng-container *ngFor="let template of hiddenTemplates">
-              <div toolbarItem class="toolbar-item-hidden">
+              <div appToolbarItem class="toolbar-item-hidden">
                 <ng-template *ngTemplateOutlet="template"></ng-template>
               </div>
             </ng-container>
@@ -68,7 +67,7 @@ export class ToolbarItemDirective {}
 export class ToolbarComponent
   implements AfterContentInit, AfterViewInit, OnDestroy
 {
-  @HostBinding('style.width') get hostWidth() {
+  @HostBinding('style.width') get hostWidth(): string {
     return this.toolbarWidth;
   }
   @Input() toolbarWidth: string = '100%';
@@ -97,7 +96,7 @@ export class ToolbarComponent
   private readonly _destroy$ = new Subject<void>();
   private _elementWidthMap: Record<number, number> = {};
 
-  constructor(private ngZone: NgZone, private cdr: ChangeDetectorRef) {}
+  constructor(private _zone: NgZone, private _changeDetector: ChangeDetectorRef) {}
 
   ngAfterContentInit(): void {
     this._displayElements();
@@ -105,7 +104,7 @@ export class ToolbarComponent
 
   ngAfterViewInit(): void {
     this._composeElementWidthMap();
-    this.ngZone.runOutsideAngular(() => {
+    this._zone.runOutsideAngular(() => {
       fromEvent(window, 'resize')
         .pipe(takeUntil(this._destroy$), startWith(null), debounceTime(300))
         .subscribe(() => {
@@ -115,7 +114,11 @@ export class ToolbarComponent
   }
 
   private _composeElementWidthMap(): void {
-    console.log(this.elementGap);
+    this._toolbarItems?.changes
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((value) => {
+        console.log(value);
+      });
     const elements = this._toolbarItems?.toArray() ?? [];
     this._elementWidthMap = elements.reduce((map, element, index) => {
       const previouseWidth = map[index - 1] ?? 0;
@@ -123,7 +126,6 @@ export class ToolbarComponent
       map[index] = elementWidth + previouseWidth + this.elementGap;
       return map;
     }, {} as Record<number, number>);
-    console.log(this._elementWidthMap);
   }
 
   private _displayElements(): void {
@@ -138,7 +140,7 @@ export class ToolbarComponent
         const templates = this._tooltipItemTemplates?.toArray() ?? [];
         this.hiddenTemplates = templates.slice(hiddenIndex);
         this.visibleTemplates = templates.slice(0, hiddenIndex);
-        this.cdr.detectChanges();
+        this._changeDetector.detectChanges();
       });
   }
 
