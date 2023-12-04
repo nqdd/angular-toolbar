@@ -99,6 +99,10 @@ export class ToolbarComponent
 
   constructor(private ngZone: NgZone, private cdr: ChangeDetectorRef) {}
 
+  ngAfterContentInit(): void {
+    this._displayElements();
+  }
+
   ngAfterViewInit(): void {
     this._composeElementWidthMap();
     this.ngZone.runOutsideAngular(() => {
@@ -110,11 +114,7 @@ export class ToolbarComponent
     });
   }
 
-  ngAfterContentInit(): void {
-    this._displayElements();
-  }
-
-  private _composeElementWidthMap() {
+  private _composeElementWidthMap(): void {
     console.log(this.elementGap);
     const elements = this._toolbarItems?.toArray() ?? [];
     this._elementWidthMap = elements.reduce((map, element, index) => {
