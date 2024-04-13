@@ -6,7 +6,6 @@ import {
   Component,
   ContentChild,
   ContentChildren,
-  Directive,
   ElementRef,
   HostBinding,
   Input,
@@ -18,19 +17,15 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { Subject, debounceTime, fromEvent, startWith, takeUntil } from 'rxjs';
-import { ELEMENT_GAP_DEFAULT } from './config';
+import { ELEMENT_GAP_DEFAULT } from './ngx-toolbar-config';
 import {
-  ToolbarCollapseButtonTemplateDirective,
-  ToolbarItemTemplateDirective,
-} from './toolbar.directive';
-
-@Directive({
-  selector: '[appToolbarItem]',
-})
-export class ToolbarItemDirective {}
+  NgxToolbarExtraButtonDirective,
+  NgxToolbarItemDirective,
+  NgxToolbarItemTemplateDirective,
+} from './ngx-toolbar.directive';
 
 @Component({
-  selector: 'app-toolbar',
+  selector: 'ngx-toolbar',
   template: `
     <div class="toolbar" #toolbar>
       <div class="toolbar-panel" #panel>
@@ -38,7 +33,7 @@ export class ToolbarItemDirective {}
           *ngFor="let template of visibleTemplates; let idx = index"
         >
           <div
-            appToolbarItem
+            ngxToolbarItem
             class="toolbar-item-visible"
             [style.marginLeft.px]="idx > 0 ? elementGap : 0"
           >
@@ -53,7 +48,7 @@ export class ToolbarItemDirective {}
             <ng-container *ngTemplateOutlet="collapseTemplate"> </ng-container>
             <div class="hidden-templates border-solid border-1 rounded">
               <ng-container *ngFor="let template of hiddenTemplates">
-                <div appToolbarItem class="toolbar-item-hidden">
+                <div ngxToolbarItem class="toolbar-item-hidden">
                   <ng-template *ngTemplateOutlet="template"></ng-template>
                 </div>
               </ng-container>
@@ -63,10 +58,10 @@ export class ToolbarItemDirective {}
       </div>
     </div>
   `,
-  styleUrls: ['./toolbar.component.scss'],
+  styleUrls: ['./ngx-toolbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToolbarComponent
+export class NgxToolbarComponent
   implements AfterContentInit, AfterViewInit, OnDestroy
 {
   @HostBinding('style.width') get hostWidth(): string {
@@ -80,19 +75,21 @@ export class ToolbarComponent
   @ViewChild('panel', { static: true })
   readonly panel!: ElementRef<HTMLDivElement>;
 
-  @ContentChild(ToolbarCollapseButtonTemplateDirective, { read: TemplateRef })
-  public readonly collapseTemplate?: TemplateRef<ToolbarCollapseButtonTemplateDirective>;
+  @ContentChild(NgxToolbarExtraButtonDirective, {
+    read: TemplateRef,
+  })
+  public readonly collapseTemplate?: TemplateRef<NgxToolbarExtraButtonDirective>;
 
-  @ViewChildren(ToolbarItemDirective, { read: ElementRef })
+  @ViewChildren(NgxToolbarItemDirective, { read: ElementRef })
   private readonly _toolbarItems?: QueryList<ElementRef<HTMLDivElement>>;
 
-  @ContentChildren(ToolbarItemTemplateDirective, { read: TemplateRef })
+  @ContentChildren(NgxToolbarItemTemplateDirective, { read: TemplateRef })
   private readonly _tooltipItemTemplates?: QueryList<
-    TemplateRef<ToolbarItemTemplateDirective>
+    TemplateRef<NgxToolbarItemTemplateDirective>
   >;
 
-  public visibleTemplates: TemplateRef<ToolbarItemTemplateDirective>[] = [];
-  public hiddenTemplates: TemplateRef<ToolbarItemTemplateDirective>[] = [];
+  public visibleTemplates: TemplateRef<NgxToolbarItemDirective>[] = [];
+  public hiddenTemplates: TemplateRef<NgxToolbarItemDirective>[] = [];
 
   private readonly _hiddenIndex$ = new Subject<number | undefined>();
   private readonly _destroy$ = new Subject<void>();
@@ -101,9 +98,7 @@ export class ToolbarComponent
   constructor(
     private _zone: NgZone,
     private _changeDetector: ChangeDetectorRef
-  ) {
-  
-  }
+  ) {}
 
   ngAfterContentInit(): void {
     this._displayElements();
